@@ -1,1 +1,1 @@
-# PyScript-Examples
+# PyScript Examples
