@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>SQL Lite Example in PyScript</title>
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.8.2/core.css">
+    <script type="module" src="https://pyscript.net/releases/2024.8.2/core.js"></script>
+     <!--
+    The following example demonstrates use of SQL lite in PyScript.
+    Things to note:
+    1. We need to use specific interpreter with some external packages. 
+    In the example below we are using ver 24.1 version of pyodide. 
+    2. We use external package - sqlite3.
+    -->
+    <py-config>   
+        # https://docs.pyscript.net/2024.8.2/user-guide/configuration/
+        interpreter = ["https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.mjs"]
+        packages = ["pandas", "sqlite3"]
+        
+       
+        [[fetch]]  
+        from = "https://raw.githubusercontent.com/jpwhite3/northwind-SQLite3/master/dist/"
+        files = ["northwind.db"]
+    </py-config>
+    
+</head>
+
+<body>
+    <button py-click="click_button_click">Console Log the Result</button>
+    
+    <script type="py">
+    
+    import pandas as pd
+    import sqlite3
+    
+    def click_button_click(e):
+        con = sqlite3.connect("northwind.db")
+        df = pd.read_sql_query("SELECT Country FROM Customers", con)
+        print(df)
+        con.close()
+    </script>
+
+</body>
+
+</html>

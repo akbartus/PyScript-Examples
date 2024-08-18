@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>CSV Example in PyScript</title>
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.8.2/core.css">
+    <script type="module" src="https://pyscript.net/releases/2024.8.2/core.js"></script>
+    <!--
+    The following example demonstrates use of csv  in PyScript.
+    Things to note:
+    1. We can use SQL query commands by converting csv data to sql:
+    -->
+    <py-config>   
+        # https://docs.pyscript.net/2024.8.2/user-guide/configuration/
+        interpreter = ["https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.mjs"]
+        packages = ["pandas","sqlite3"]
+    </py-config>
+    
+</head>
+
+<body>
+    <button py-click="click_button_click">Click to show table</button>
+    <script type="py">
+        import pandas as pd 
+        import sqlite3 as sql
+        from pyscript import display
+        from pyodide.http import open_url
+
+
+        def click_button_click(e):
+            url_content = open_url("diamonds.csv")
+            myData = pd.read_csv(url_content)
+
+            conn = sql.connect('diamonds.db')
+            myData.to_sql('diamonds', conn) # convert to sql compatible file
+
+            df = pd.read_sql_query('SELECT cut, avg(price) as avg_price FROM diamonds group by 1', conn)
+
+            print(df)
+            display(df)
+    </script>
+
+</body>
+
+</html>
