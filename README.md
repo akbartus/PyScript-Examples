@@ -21,4 +21,4 @@ It was developed based on the following sources:
 The project is powered by PyScript and respective python packages.
         
 ### **Demo**
-Demo: 
+Demo: https://pyscript-example.glitch.me/
