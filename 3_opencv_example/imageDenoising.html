@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Using PyScript with OpenCV: Image Denoising</title>
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.8.2/core.css">
+    <script type="module" src="https://pyscript.net/releases/2024.8.2/core.js"></script>
+    <py-config>
+        packages = ['opencv-python', 'matplotlib']
+        [[fetch]]
+        files = ["noiseimage.png"]
+    </py-config>
+    
+</head>
+
+<body>
+
+    <button py-click="click_button_click">Denoise</button>
+    <script type="py">
+        import cv2 as cv
+        import numpy as np
+        from matplotlib import pyplot as plt
+     
+
+        def click_button_click(e):
+              
+            img = cv.imread('noiseimage.png')
+            
+            dst = cv.fastNlMeansDenoisingColored(img,None,10,10,7,21)
+            
+            plt.subplot(121),plt.imshow(img)
+            plt.subplot(122),plt.imshow(dst)
+            plt.show()
+           
+    </script>
+</body>
+
+</html>
