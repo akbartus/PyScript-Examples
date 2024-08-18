@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Using PyScript with OpenCV: Feature Matching</title>
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.8.2/core.css">
+    <script type="module" src="https://pyscript.net/releases/2024.8.2/core.js"></script>
+    <py-config>
+        packages = ['opencv-python', 'matplotlib']
+        [[fetch]]
+        files = ["box.png", "box_in_scene.png"]
+    </py-config>
+    
+</head>
+
+<body>
+
+    <button py-click="click_button_click">Show matches</button>
+    <script type="py">
+        import cv2 as cv
+        import numpy as np
+        from matplotlib import pyplot as plt
+     
+
+        def click_button_click(e):
+            
+        
+         
+            img1 = cv.imread('box.png',cv.IMREAD_GRAYSCALE)          # queryImage
+            img2 = cv.imread('box_in_scene.png',cv.IMREAD_GRAYSCALE) # trainImage
+            
+            # Initiate SIFT detector
+            sift = cv.SIFT_create()
+            
+            # find the keypoints and descriptors with SIFT
+            kp1, des1 = sift.detectAndCompute(img1,None)
+            kp2, des2 = sift.detectAndCompute(img2,None)
+            
+            # BFMatcher with default params
+            bf = cv.BFMatcher()
+            matches = bf.knnMatch(des1,des2,k=2)
+            
+            # Apply ratio test
+            good = []
+            for m,n in matches:
+                if m.distance < 0.75*n.distance:
+                    good.append([m])
+            
+            # cv.drawMatchesKnn expects list of lists as matches.
+            img3 = cv.drawMatchesKnn(img1,kp1,img2,kp2,good,None,flags=cv.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
+            
+            plt.xticks([]), plt.yticks([]) # hide values on X and Y axis 
+            plt.imshow(img3)
+            plt.show()
+           
+    </script>
+</body>
+
+</html>
