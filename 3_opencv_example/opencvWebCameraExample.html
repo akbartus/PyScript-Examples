@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>WebCamera Example using PyScript</title>
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.8.2/core.css">
+    <script type="module" src="https://pyscript.net/releases/2024.8.2/core.js"></script>
+    <py-config>
+        packages = ['opencv-python', 'pillow']
+    </py-config>
+</head>
+
+<body>
+    <div>
+        <button id="start-camera">Start Camera</button>
+        <video id="video" width="600" height="400" autoplay></video>
+    </div>
+    <div id="video-container" width="600" height="400"></div>
+
+    <script type="py">
+    # This example was taken from user of Discord channel, Shashwat
+          
+    import js, cv2, base64, io
+    import numpy as np
+    from pyodide.ffi import create_proxy
+    from PIL import Image
+
+    camera_button = js.document.querySelector("#start-camera")
+    video_element = js.document.querySelector("#video")
+
+
+
+    async def start(e):
+        media = js.Object.new()
+        media.audio = False
+        media.video = True
+        stream = await js.navigator.mediaDevices.getUserMedia(media)
+        video_element.srcObject = stream
+
+        js.window.requestAnimationFrame(create_proxy(display_frame))
+
+
+    video_container = js.document.getElementById("video-container")
+
+    def convert_to_cv2_image(image_data):
+        image_data = image_data.split(",")[1]
+
+        decoded_data = base64.b64decode(image_data)
+
+        np_data = np.frombuffer(decoded_data, np.uint8)
+
+        new_img = cv2.imdecode(np_data, cv2.IMREAD_COLOR)
+        return new_img
+
+
+    def processing(img):
+        cv2.putText(img, "Text", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
+        return img
+
+
+    def convert_to_image_data_url(cv2_image):
+        pil_image = Image.fromarray(cv2.cvtColor(cv2_image, cv2.COLOR_BGR2RGB))
+
+        with io.BytesIO() as output:
+            pil_image.save(output, format="JPEG")
+            contents = output.getvalue()
+
+        img_str = base64.b64encode(contents).decode("utf-8")
+
+        return "data:image/jpeg;base64," + img_str
+
+
+    def display_frame(e):
+
+        canvas = js.document.createElement("canvas")
+        canvas.width = video_element.width
+        canvas.height = video_element.height
+
+        ctx = canvas.getContext("2d")
+        ctx.drawImage(video_element, 0, 0, canvas.width, canvas.height)
+
+        cv2_img = convert_to_cv2_image(canvas.toDataURL())
+
+        processed_img = processing(cv2_img)
+
+        img = js.document.createElement("img")
+        img.src = convert_to_image_data_url(processed_img)
+
+        
+        video_container.innerHTML = ""
+        video_container.appendChild(img)
+
+        js.window.requestAnimationFrame(create_proxy(display_frame))
+
+
+    camera_button.addEventListener("click", create_proxy(start))
+    </script>
+</body>
+
+</html>
