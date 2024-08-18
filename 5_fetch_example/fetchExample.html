@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Fetch Example using PyScript</title>
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.8.2/core.css">
+    <script type="module" src="https://pyscript.net/releases/2024.8.2/core.js"></script>
+</head>
+
+<body>
+    <!--
+    The following example demonstrates the use of fetch in PyScript.
+    Things to note:
+    1. Fetch is already inbuilt into PyScript. It can be used by importing it:
+       from pyscript import fetch
+    -->
+   
+    <script type="py">
+        from pyscript import fetch
+
+        response = await fetch(
+            "https://opentdb.com/api.php?amount=10",
+            method="GET"
+        ).json()
+        print(response)
+       
+    </script>
+
+    
+</body>
+
+</html>

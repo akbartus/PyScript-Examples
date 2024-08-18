@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Using Events in PyScript</title>
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.8.2/core.css">
+    <script type="module" src="https://pyscript.net/releases/2024.8.2/core.js"></script>
+</head>
+<body>
+    <!-- 
+    The following example demonstrates events (click, etc) in PyScript.     
+    Things to note:
+    1. It is possible to add event listener by using: 
+      py-click="showTimeThroughButton".
+    2. It is possible to add event listener by importing:
+      import js 
+      from pyodide.ffi.wrappers import add_event_listener
+    and adding:
+      add_event_listener(myButton, "click", click) 1. element 2. event type, 3. function referenced 
+    3. By using when decorator: 
+      @when("click", "#my_button") 1. event. 2. selector 
+    In this any function below decorator will be executed.
+    --> 
+    
+    <button id="another" py-click="showTimeThroughButton">Click Button</button>
+    <button id="showTimeThroughJs">Click Js</button>
+
+    <py-script>
+      from datetime import datetime
+      from pyscript import display
+
+      import js
+      from pyodide.ffi.wrappers import add_event_listener
+      
+      <!-- Using py -->
+      def showTimeThroughButton(event):
+        print("You clicked the button")
+      
+        
+      <!-- Using js and add_event_listener -->
+      def click(event):
+        print("You clicked the button")
+
+      myButton = js.document.getElementById("showTimeThroughJs")
+      add_event_listener(myButton, "click", click)
+    </py-script>
+
+
+    <input type="file" name="upload" id="upload">
+
+    <!-- Using when decorator -->
+    <script type="py">
+      from pyscript import when, display
+
+      @when("change", "#upload") 
+
+      def myfunction(event):
+        display("Something was uploaded!")
+    </script>
+  </body>

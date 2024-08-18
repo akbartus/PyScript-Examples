@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Live Editor Mode in PyScrpt</title>
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.8.2/core.css">
+    <script type="module" src="https://pyscript.net/releases/2024.8.2/core.js"></script>
+</head>
+
+<body>
+     <!--
+    The following example demonstrates live editor feature in PyScript.
+    Things to note:
+    1. To use live editor we need to add attribute: type="py-editor".
+    -->
+    <div id="editor"></div>
+    
+    <script type="py-editor" target="editor">
+        # Text inside the live editor is pre-populated
+        for i in range(5):
+            print(i)
+    </script>
+
+    <script type="py-editor" target="editor">
+        # Text inside the live editor is pre-populated
+        def doThis(n):
+            return n+2
+        
+        print(doThis(100))
+    </script>
+</body>
+
+
+
+
+</html>
+

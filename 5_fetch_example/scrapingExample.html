@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Web Scraping Example using PyScript</title>
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.8.2/core.css">
+    <script type="module" src="https://pyscript.net/releases/2024.8.2/core.js"></script>
+     <!--
+    The following example demonstrates webscraping in PyScript.
+    Things to note:
+    1. We need to use specific interpreter with some external packages. 
+    In the example below we are using ver 24.1 version of pyodide. 
+    2. Pyscript is not able to overcome cors issue. Therefore we need to use
+    proxy.
+    -->
+    
+    <py-config>
+        interpreter = ["https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.mjs"]
+        packages = [ 'requests', 'beautifulsoup4' ]
+    </py-config>
+</head>
+
+<body>
+    <script type="py">
+        import requests
+        from bs4 import BeautifulSoup
+   
+        
+        # Send an HTTP request to the URL of the webpage you want to access
+        # you cal also use: https://CorsProxy.io/?
+        response = requests.get("https://proxy.cors.sh/https://www.imdb.com/chart/top")
+        
+        # Parse the HTML content using BeautifulSoup
+        soup = BeautifulSoup(response.content, "html.parser")
+        
+        #text = soup.get_text()
+        #text = soup.prettify()
+        text = soup.find_all('a') #etc
+        print(text)
+       
+    </script>
+
+    
+</body>
+
+</html>

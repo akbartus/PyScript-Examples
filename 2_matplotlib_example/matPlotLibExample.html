@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>MatPlotLib Example using PyScript</title>
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.8.2/core.css">
+    <script type="module" src="https://pyscript.net/releases/2024.8.2/core.js"></script>
+    <py-config>
+        packages = ['matplotlib', 'numpy']
+    </py-config>    
+</head>
+
+<body>
+    <!--
+    The following example demonstrates the use of external package - MatPlotLib
+    and its loading inside of target divs. Things to note:
+    1. We indicate the external packages we want to load inside <py-config>. 
+        This is an inline loading of the package.
+    2. We can indicate where to display content either by indicating inside 
+    <py-script> using display feature from pyscript:
+        display(plt, target="targetDiv")
+    or we can do so by indicating target attribute in script:
+        target="my-h1"
+    -->
+
+    <!-- Place result inside div as part of pyscript code -->
+    <div id="targetDiv"></div>
+    <py-script>
+    import matplotlib.pyplot as plt
+    import numpy as np
+    from pyscript import display
+    
+    time = np.linspace(0, 2 * np.pi, 100)
+    plt.plot(time, np.sin(time))    
+    display(plt, target="targetDiv") # display(firstvalue = thing to show, secondvalue = to show where)
+    </py-script>
+
+    <!-- Place result inside div as part of script attribute -->
+    <h1 id="my-h1"></h1>    
+    <script type="py" target="my-h1">
+    import matplotlib.pyplot as plt
+    import numpy as np
+    
+    time = np.linspace(0, 2 * np.pi, 100)
+    plt.plot(time, np.sin(time))    
+    plt.show()
+    </script>
+
+    
+</body>
+
+</html>

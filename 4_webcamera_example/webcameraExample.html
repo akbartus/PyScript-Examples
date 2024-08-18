@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>WebCamera Example using PyScript</title>
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.8.2/core.css">
+    <script type="module" src="https://pyscript.net/releases/2024.8.2/core.js"></script>
+</head>
+
+<body>
+    <!--
+    The following example demonstrates the use of webcamera in PyScript.
+    Things to note:
+    1. We can access js functionality by using:
+        import js
+    or by using:
+        from pyscript import document
+    -->
+    <div>
+        <button py-click="camera_start">Start Camera</button>
+        <button py-click="camera_stop">Stop Camera</button>
+        <button py-click="drawOnCanvas">Draw on Canvas</button>
+        <video id="video" width="600" height="400" autoplay></video>
+        <canvas id="canvas" width="600" height="400"></canvas>
+    </div>
+    <script type="py">
+        import js        
+        
+        media = js.Object.new()
+        video = js.document.querySelector("#video")
+        canvas = js.document.querySelector("#canvas")
+        
+        async def camera_start(e):            
+            media.audio = False
+            media.video = True
+            stream = await js.navigator.mediaDevices.getUserMedia(media)
+            video.srcObject = stream
+        
+        async def camera_stop(e):            
+            # Get the media stream from the video element
+            stream = video.srcObject
+            # Stop all tracks in the stream
+            if stream is not None:
+                for track in stream.getTracks():
+                    track.stop()
+            video.srcObject = None
+        
+        async def drawOnCanvas(e):        
+            canvas.getContext('2d').drawImage(video,0,0,canvas.width, canvas.height )
+            image_data_url = canvas.toDataURL('image/jpeg')
+            js.console.log(image_data_url)
+       
+    </script>
+</body>
+
+</html>
