@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Using PyScript with OpenCV: Drawing and Image</title>
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.8.2/core.css">
+    <script type="module" src="https://pyscript.net/releases/2024.8.2/core.js"></script>
+    
+     <!--
+    The following example demonstrates the use of external package - OpenCV.
+    Things to note:
+    1. Since imshow in openCV is not supported when used in PyScript,
+    we use matplotlib for displaying.
+    2. We cannot directly reference an image we want to use. In PyScript
+    we first fetch images or any type of file inside py-config.
+    -->
+    <py-config>
+        packages = ['opencv-python', 'matplotlib']
+        [[fetch]]
+        files = ["image.jpg"]
+    </py-config>
+    
+</head>
+
+<body>
+    <button py-click="click_button_click">Click to draw</button>
+    <script type="py">
+        import cv2 as cv
+        import numpy as np
+        from matplotlib import pyplot as plt
+        from pyscript import display
+
+        def click_button_click(e):
+            img = np.zeros((512,512,3), np.uint8)
+            pts = np.array([[10,5],[20,30],[70,20],[500,400]], np.int32)
+            pts = pts.reshape((-1,1,2))
+            cv.polylines(img,[pts],True,(0,255,255))
+         
+            plt.imshow(img) # use matplotlib
+            plt.xticks([]), plt.yticks([]) # hide values on X and Y axis 
+            display(plt)
+    </script>
+</body>
+
+</html>

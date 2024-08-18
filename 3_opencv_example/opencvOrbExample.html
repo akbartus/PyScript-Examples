@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Using PyScript with OpenCV: Orb Features</title>
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.8.2/core.css">
+    <script type="module" src="https://pyscript.net/releases/2024.8.2/core.js"></script>
+    <py-config>
+        packages = ['opencv-python', 'matplotlib']
+        [[fetch]]
+        files = ["image.jpg"]
+    </py-config>
+    
+</head>
+
+<body>
+
+    <button py-click="click_button_click">Click to draw</button>
+    <script type="py">
+        import cv2 as cv
+        import numpy as np
+        from matplotlib import pyplot as plt
+    
+
+        def click_button_click(e):
+         
+            img = cv.imread('image.jpg', cv.IMREAD_GRAYSCALE)
+            
+            # Initiate ORB detector
+            orb = cv.ORB_create()
+            
+            # find the keypoints with ORB
+            kp = orb.detect(img,None)
+            
+            # compute the descriptors with ORB
+            kp, des = orb.compute(img, kp)
+            
+            # draw only keypoints location,not size and orientation
+            img2 = cv.drawKeypoints(img, kp, None, color=(0,255,0), flags=0)
+            plt.xticks([]), plt.yticks([]) # hide values on X and Y axis 
+            plt.imshow(img2)
+            plt.show()
+    </script>
+</body>
+
+</html>

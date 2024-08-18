@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Using PyScript with OpenCV: WaterShed Algorithm</title>
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.8.2/core.css">
+    <script type="module" src="https://pyscript.net/releases/2024.8.2/core.js"></script>
+    <py-config>
+        packages = ['opencv-python', 'matplotlib']
+        [[fetch]]
+        files = ["coins.png", "a1.png"]
+    </py-config>
+    
+</head>
+
+<body>
+
+    <button py-click="click_button_click">Click to draw</button>
+    <script type="py">
+        import cv2 as cv
+        import numpy as np
+        from matplotlib import pyplot as plt
+        from pyscript import display
+
+        def click_button_click(e):
+            
+            #Reading image using cv libraries
+            #img = cv.imread('coins.png')
+            img = cv.imread('a1.png')
+            gray = cv.cvtColor(img,cv.COLOR_BGR2GRAY)
+            ret, thresh = cv.threshold(gray,0,255,cv.THRESH_BINARY_INV+cv.THRESH_OTSU)
+
+
+            # Noise Removal
+            kernel = np.ones((3,3),np.uint8)
+            opening = cv.morphologyEx(thresh,cv.MORPH_OPEN,kernel, iterations = 2)
+
+            # Background area 
+            sure_bg = cv.dilate(opening,kernel,iterations=3)
+
+            # Foreground area
+            dist_transform = cv.distanceTransform(opening,cv.DIST_L2,5)
+            ret, sure_fg = cv.threshold(dist_transform,0.7*dist_transform.max(),255,0)
+
+            # Finding unknown region
+            sure_fg = np.uint8(sure_fg)
+            unknown = cv.subtract(sure_bg,sure_fg)
+
+            # Marker labelling
+            ret, markers = cv.connectedComponents(sure_fg)
+
+            #Applying watershed algorithm and marking the regions segmented
+            markers = markers+1
+            markers[unknown==255] = 0
+            markers = cv.watershed(img,markers)
+            img[markers == -1] = [0,255,255]
+
+            #Displaying the segmented image
+            imS = cv.resize(img, (612, 368))
+            plt.imshow(imS)
+            plt.xticks([]), plt.yticks([]) # hide values on X and Y axis 
+            display(plt)
+    </script>
+</body>
+
+</html>

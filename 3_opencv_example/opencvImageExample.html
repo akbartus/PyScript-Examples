@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Using PyScript with OpenCV: Image</title>
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.8.2/core.css">
+    <script type="module" src="https://pyscript.net/releases/2024.8.2/core.js"></script>
+     <!--
+    The following example demonstrates the use of external package - OpenCV.
+    Things to note:
+    1. We can show image either by using matplotlib's show method or display feature of pyscript.
+    -->
+    <py-config>
+        packages = ['opencv-python', 'matplotlib']
+        [[fetch]]
+        files = ["image.jpg"]
+    </py-config>    
+</head>
+
+<body>
+    <button py-click="showImage1">Show image 1</button>
+    <button py-click="showImage2">Show image 2</button>
+    <script type="py">
+        import cv2
+        import numpy as np
+        from matplotlib import pyplot as plt
+        from pyscript import display      
+  
+
+        def showImage1(e):
+            img = cv2.imread('image.jpg',cv2.IMREAD_GRAYSCALE)
+            plt.imshow(img, cmap = 'gray', interpolation = 'bicubic')
+            plt.xticks([]), plt.yticks([])  # to hide tick values on X and Y axis
+            plt.plot([200,300,400],[100,200,300],'c', linewidth=5)
+            plt.show() # use matplotlib
+            display(plt) # use pyscript
+    </script>
+
+    <script type="py">
+        import cv2 as cv
+        from matplotlib import pyplot as plt
+        from pyscript import display
+
+        def showImage2(e):
+            img = cv.imread("image.jpg")
+            
+            font = cv.FONT_HERSHEY_SIMPLEX
+            cv.putText(img,'OpenCV',(10,500), font, 4,(255,255,255),2,cv.LINE_AA)
+            plt.imshow(img)
+            plt.xticks([]), plt.yticks([]) # hide values on X and Y axis 
+            display(plt)
+    </script>
+</body>
+
+</html>
