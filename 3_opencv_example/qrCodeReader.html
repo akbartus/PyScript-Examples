@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Using PyScript with OpenCV: QR Code Reader</title>
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.8.2/core.css">
+    <script type="module" src="https://pyscript.net/releases/2024.8.2/core.js"></script>
+    <py-config>
+        packages = ['opencv-python', 'matplotlib']
+        [[fetch]]
+        files = ["qrcode.png"]
+    </py-config>
+    
+</head>
+
+<body>
+
+    <button py-click="click_button_click">Show matches</button>
+    <script type="py">
+        
+        import cv2 as cv
+        from matplotlib import pyplot as plt
+     
+
+        def click_button_click(e):
+            
+        
+         
+            img = cv.imread('qrcode.png')
+
+            qcd = cv.QRCodeDetector()
+            
+            retval, decoded_info, points, straight_qrcode = qcd.detectAndDecodeMulti(img)
+            
+           
+            
+            img = cv.polylines(img, points.astype(int), True, (0, 255, 0), 3)
+            
+            for s, p in zip(decoded_info, points):
+                img = cv.putText(img, s, p[0].astype(int),
+                                cv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv.LINE_AA)
+            
+            plt.xticks([]), plt.yticks([]) # hide values on X and Y axis 
+            plt.imshow(img)
+            plt.show()
+           
+    </script>
+</body>
+
+</html>
