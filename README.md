@@ -1,7 +1,7 @@
 # PyScript Examples
 
 ### **Description / Rationale**
-Present repository demonstrates example created in PyScript to help in learning it. It contains the following examples:
+Present repository demonstrates examples created in PyScript to help in learning it as well as to show its capabilities. The repository contains the following examples:
 1. Basics
 2. Matplotlib related example
 3. OpenCV related examples
