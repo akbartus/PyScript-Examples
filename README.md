@@ -16,6 +16,7 @@ It was developed based on the following sources:
 * Articles by Jeff Glass related to PyScript: https://jeff.glass/tags/pyscript/
 * John Hanley's articles related to PyScript: https://www.jhanley.com/blog/contents/
 * Various code samples provided by Discord Channel users of PyScript.
+* The document scanner example for OpenCV was adapted from Vipul's "Document Scanner" repo: https://github.com/vipul-sharma20/document-scanner
 
 ### **Tech Stack**
 The project is powered by PyScript and respective python packages.
