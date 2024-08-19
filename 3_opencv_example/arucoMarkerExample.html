@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Using PyScript with OpenCV: Aruco Marker</title>
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.8.2/core.css">
+    <script type="module" src="https://pyscript.net/releases/2024.8.2/core.js"></script>
+    <py-config>
+        packages = ['opencv-python', 'matplotlib']
+        [[fetch]]
+        files = ["aruco.jpg"]
+    </py-config>
+    
+</head>
+
+<body>
+
+    <button py-click="click_button_click">Detect Aruco Markers</button>
+    <script type="py">
+        import cv2 as cv
+        from matplotlib import pyplot as plt
+     
+
+        def click_button_click(e):
+            # Load the dictionary
+            dictionary = cv.aruco.getPredefinedDictionary(cv.aruco.DICT_6X6_250)
+            
+            # Create detector parameters
+            parameters = cv.aruco.DetectorParameters()
+
+            detector = cv.aruco.ArucoDetector(dictionary, parameters)
+            
+            # Read an image
+            image = cv.imread('aruco.jpg')
+
+            # Convert the image to grayscale
+            gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
+
+            # Detect markers
+            corners, ids, _ = detector.detectMarkers(image)  
+            
+            # Check if any markers were detected
+            if corners is not None:
+                # Draw detected markers
+                image_markers = cv.aruco.drawDetectedMarkers(image.copy(), corners, ids)
+            else:
+                print("No markers found") 
+            
+            # Display the image with detected markers
+           
+            plt.xticks([]), plt.yticks([]) # hide values on X and Y axis 
+            plt.imshow(image_markers)
+            plt.show()
+           
+    </script>
+</body>
+
+</html>
