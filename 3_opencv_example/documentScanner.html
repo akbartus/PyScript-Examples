@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Using PyScript with OpenCV: Document Scanner</title>
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.8.2/core.css">
+    <script type="module" src="https://pyscript.net/releases/2024.8.2/core.js"></script>
+    <py-config>
+        packages = ['opencv-python', 'matplotlib']
+        [[fetch]]
+        files = ["document.jpg"]
+    </py-config>
+    
+</head>
+
+<body>
+<!--
+The document scanner code as well as image were taken and adapted from Vipul's "Document Scanner" Repo
+which can be found here: https://github.com/vipul-sharma20/document-scanner
+-->
+    <button py-click="scanDocument">Scan Document</button>
+    <script type="py">
+        import cv2 as cv
+        import numpy as np
+        from matplotlib import pyplot as plt
+     
+
+        def rectify(h):
+            h = h.reshape((4,2))
+            hnew = np.zeros((4,2),dtype = np.float32)
+
+            add = h.sum(1)
+            hnew[0] = h[np.argmin(add)]
+            hnew[2] = h[np.argmax(add)]
+
+            diff = np.diff(h,axis = 1)
+            hnew[1] = h[np.argmin(diff)]
+            hnew[3] = h[np.argmax(diff)]
+
+            return hnew
+
+        def scanDocument(e):
+         
+            # add image here.
+            # We can also use laptop's webcam if the resolution is good enough to capture
+            # readable document content
+            image = cv.imread('document.jpg')
+            
+            # resize image so it can be processed
+            # choose optimal dimensions such that important content is not lost
+            image = cv.resize(image, (1500, 880))
+            
+            # creating copy of original image
+            orig = image.copy()
+            
+            # convert to grayscale and blur to smooth
+            gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
+            blurred = cv.GaussianBlur(gray, (5, 5), 0)
+            #blurred = cv.medianBlur(gray, 5)
+            
+            # apply Canny Edge Detection
+            edged = cv.Canny(blurred, 0, 50)
+            orig_edged = edged.copy()
+            
+            # find the contours in the edged image, keeping only the
+            # largest ones, and initialize the screen contour
+            (contours, _) = cv.findContours(edged, cv.RETR_LIST, cv.CHAIN_APPROX_NONE)
+            contours = sorted(contours, key=cv.contourArea, reverse=True)
+            
+            #x,y,w,h = cv.boundingRect(contours[0])
+            #cv.rectangle(image,(x,y),(x+w,y+h),(0,0,255),0)
+            
+            # get approximate contour
+            for c in contours:
+                p = cv.arcLength(c, True)
+                approx = cv.approxPolyDP(c, 0.02 * p, True)
+            
+                if len(approx) == 4:
+                    target = approx
+                    break
+            
+            
+            # mapping target points to 800x800 quadrilateral
+            approx = rectify(target)
+            pts2 = np.float32([[0,0],[800,0],[800,800],[0,800]])
+            
+            M = cv.getPerspectiveTransform(approx,pts2)
+            dst = cv.warpPerspective(orig,M,(800,800))
+            
+            cv.drawContours(image, [target], -1, (0, 255, 0), 2)
+            dst = cv.cvtColor(dst, cv.COLOR_BGR2GRAY)
+            
+            
+            # using thresholding on warped image to get scanned effect (If Required)
+            ret,th1 = cv.threshold(dst,127,255,cv.THRESH_BINARY)
+            th2 = cv.adaptiveThreshold(dst,255,cv.ADAPTIVE_THRESH_MEAN_C,\
+                        cv.THRESH_BINARY,11,2)
+            th3 = cv.adaptiveThreshold(dst,255,cv.ADAPTIVE_THRESH_GAUSSIAN_C,\
+                        cv.THRESH_BINARY,11,2)
+            ret2,th4 = cv.threshold(dst,0,255,cv.THRESH_BINARY+cv.THRESH_OTSU)
+            
+            images = [orig, gray, blurred, orig_edged, image, th1, th2, th3, th4, dst]
+            titles = ['Original', 'Gray', 'Blurred', 'Original Edged', 'Image', 'Th1', 'Th2', 'Th3', 'Th4', 'Dst']
+            
+            # Iterate through images and display each one
+            for img, title in zip(images, titles):
+                plt.figure()  # Create a new figure
+                plt.imshow(img, cmap='gray')  # Display image; adjust cmap if necessary
+                plt.title(title)
+                plt.axis('off')  # Hide axes
+                plt.show()  # Display the current image
+
+           
+            
+            # other thresholding methods
+            """
+            ret,thresh1 = cv.threshold(dst,127,255,cv.THRESH_BINARY)
+            ret,thresh2 = cv.threshold(dst,127,255,cv.THRESH_BINARY_INV)
+            ret,thresh3 = cv.threshold(dst,127,255,cv.THRESH_TRUNC)
+            ret,thresh4 = cv.threshold(dst,127,255,cv.THRESH_TOZERO)
+            ret,thresh5 = cv.threshold(dst,127,255,cv.THRESH_TOZERO_INV)
+            
+            cv.imshow("Thresh Binary", thresh1)
+            cv.imshow("Thresh Binary_INV", thresh2)
+            cv.imshow("Thresh Trunch", thresh3)
+            cv.imshow("Thresh TOZERO", thresh4)
+            cv.imshow("Thresh TOZERO_INV", thresh5)
+            """
+            
+           
+           
+    </script>
+</body>
+
+</html>
