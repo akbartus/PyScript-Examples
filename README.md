@@ -9,6 +9,7 @@ Present repository demonstrates examples created in PyScript to help in learning
 5. Fetch examples
 6. Editor example
 7. SQL and CSV examples
+8. SQLite vector database example
 
 It was developed based on the following sources:
 * PyScript documentation: https://docs.pyscript.net/2024.8.2/
