@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Vector SQL Lite DB Example in PyScript</title>
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.8.2/core.css">
+    <script type="module" src="https://pyscript.net/releases/2024.8.2/core.js"></script>
+       
+    <py-config>   
+        # https://docs.pyscript.net/2024.8.2/user-guide/configuration/
+        interpreter = ["https://cdn.jsdelivr.net/pyodide/v0.27.0/full/pyodide.mjs"]
+        
+        # https://github.com/asg017/sqlite-vec/issues/135 
+        packages = ["https://cdn.glitch.global/57229d08-2649-4241-bc56-c8d6dabef478/sqlite3-1.0.0-py2.py3-none-any.whl",
+        "https://cdn.glitch.global/57229d08-2649-4241-bc56-c8d6dabef478/sqlite_vec-0.1.3-cp312-cp312-pyodide_2024_0_wasm32.whl"]
+       
+        
+    </py-config>
+    
+</head>
+
+<body>
+    <script type="py">
+
+    import sqlite3
+    import sqlite_vec
+    from typing import List
+    import struct
+  
+    
+    def serialize_f32(vector: List[float]) -> bytes:
+        """serializes a list of floats into a compact "raw bytes" format"""
+        return struct.pack("%sf" % len(vector), *vector)
+    
+    
+    db = sqlite3.connect(":memory:")
+    db.enable_load_extension(True)
+    sqlite_vec.load(db)
+    db.enable_load_extension(False)
+    
+    sqlite_version, vec_version = db.execute(
+        "select sqlite_version(), vec_version()"
+    ).fetchone()
+    print(f"sqlite_version={sqlite_version}, vec_version={vec_version}")
+    
+    items = [
+        (1, [0.1, 0.1, 0.1, 0.1]),
+        (2, [0.2, 0.2, 0.2, 0.2]),
+        (3, [0.3, 0.3, 0.3, 0.3]),
+        (4, [0.4, 0.4, 0.4, 0.4]),
+        (5, [0.5, 0.5, 0.5, 0.5]),
+    ]
+    query = [0.3, 0.3, 0.3, 0.3]
+    
+    db.execute("CREATE VIRTUAL TABLE vec_items USING vec0(embedding float[4])")
+    
+    with db:
+        for item in items:
+            db.execute(
+                "INSERT INTO vec_items(rowid, embedding) VALUES (?, ?)",
+                [item[0], serialize_f32(item[1])],
+            )
+    
+    rows = db.execute(
+        """
+          SELECT
+            rowid,
+            distance
+          FROM vec_items
+          WHERE embedding MATCH ?
+          ORDER BY distance
+          LIMIT 5
+        """,
+        [serialize_f32(query)],
+    ).fetchall()
+    
+    print(rows)
+    </script>
+
+</body>
+
+</html>
